@@ -116,7 +116,7 @@ ul{
 .lt_main{
   height: 1000px;
   padding-left: 180px;
-  background-color: pink;
+
   padding-top: 50px;
   transition: all 1s;
 }
@@ -145,6 +145,14 @@ ul{
   text-align: center;
   color: #fff;
   font-size: 20px;
+}
+
+
+/* 柱状图  饼状图 */
+.echarts_left,
+.echarts_right{
+  height: 400px;
+  width: 48%;
 }
 
 
