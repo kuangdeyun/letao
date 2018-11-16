@@ -78,7 +78,7 @@ $(function(){
     // 阻止默认的表单提交
     e.preventDefault();
 
-    console.log("校验通过 ， 通过 ajax 提交");
+    // console.log("校验通过 ， 通过 ajax 提交");
 
     // 通过 ajax 提交
     $.ajax({
