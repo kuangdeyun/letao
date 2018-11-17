@@ -6,7 +6,7 @@ $(function(){
   var pageSize = 5;      // 每页多少条
 
 
-  // // 一进入页面， 发送ajax请求， 获取数据，进行页面动态渲染
+  // // 1. 一进入页面， 发送ajax请求， 获取数据，进行页面动态渲染
   render();
 
   function render(){
@@ -43,4 +43,71 @@ $(function(){
       }
     })
   }
+
+
+
+  // 2. 点击添加按钮， 显示添加模态框
+  $('#addBtn').click(function(){
+    // 显示模态框
+    $("#addModal").modal("show");
+  });
+
+  // 3. 表单校验功能
+  $("form").bootstrapValidator({
+    // 配置校验图标
+    feedbackIcons: {
+      valid: 'glyphicon glyphicon-ok',    // 校验成功
+      invalid: 'glyphicon glyphicon-remove',  // 校验失败
+      validating: 'glyphicon glyphicon-refresh'  // 校验中
+    },
+
+    // 字段列表
+    fields: {
+      categoryName: {
+        // 校验规则
+        validators:{
+          // 非空
+          notEmpty: {
+            message: "请输入一级分类"
+          }
+        }
+      }
+    }
+  });
+
+
+  // 4. 注册表单校验成功事件, 阻止默认的提交, 通过ajax提交
+  $('#form').on("success.form.bv" , function(e){
+    // 阻止默认的提交
+    e.preventDefault();
+
+    // 通过ajax提交
+    $.ajax({
+      type: "post",
+      url: "/category/addTopCategory",
+      data: $('#form').serialize(),
+      dataType: "json",
+      success: function(info){
+        console.log(info);
+        if( info.success ){
+          // 添加成功
+          // 关闭模态框
+          $("#addModal").modal("hide");
+          // 重新渲染第一页
+          currentPage = 1;
+          render();
+
+          // 重置表单的内容和状态
+          // resetForm( true )  表示内容和状态都重置
+          // resetForm()        表示只重置状态
+          $('#form').data("bootstrapValidator").resetForm( true );
+        }
+      }
+    })
+  })
+
+
+
+
+
 })
