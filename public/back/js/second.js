@@ -78,8 +78,17 @@ $(function(){
     //  获取 a 的文本
     var txt = $(this).text();
     // console.log( txt);
-
+    // 将文本设置给 按钮
     $("#dropdownText").text(txt);
+
+    // 获取 id， 设置给准备好的 input
+    var id = $(this).data("id");
+    $('[name="categoryId"]').val( id );
+
+     // $('[name="categoryId"]').trigger("input");
+
+     // 手动将 name="categoryId" 的校验状态, 改成 VALID 校验成功
+     $('#form').data("bootstrapValidator").updateStatus("categoryId" , "VALID");
   })
 
 
@@ -99,16 +108,88 @@ $(function(){
       var picUrl = result.picAddr;
       // 设置给 img 的 src
       $("#imgBox img").attr("src" , picUrl);
+
+      // 将 src 路径， 实时设置给 input
+      $('[name="brandLogo"]').val( picUrl );
+
+      // 将 name="brandLogo" 的校验状态， 改成成功
+      $('#form').data("bootstrapValidator").updateStatus("brandLogo" , "VALID");
     }
 });
 
 
   
+  // 5. 配置表单校验
+  $("#form").bootstrapValidator({
+    // 配置排序项, 默认会对隐藏域进行排除, 我们需要对隐藏域进行校验
+    excluded: [],
 
-  
+    // 配置校验图标
+    feedbackIcons: {
+      valid: 'glyphicon glyphicon-ok',    // 校验成功
+      invalid: 'glyphicon glyphicon-remove',  // 校验失败
+      validating: 'glyphicon glyphicon-refresh'  // 校验中
+    },
+
+    // 校验字段
+    fields: {
+      categoryId: {
+        validators: {
+          notEmpty: {
+            message: "请选择一级分类"
+          }
+        }
+      },
+
+      brandName: {
+        validators: {
+          notEmpty: {
+            message: "请输入二级分类名称"
+          }
+        }
+      },
+
+      brandLogo: {
+        validators: {
+          notEmpty: {
+            message: "请选择图片"
+          }
+        }
+      }
+    }
+  })
 
 
+  // 6. 注册表单校验成功事件， 阻止默认的表单提交， 通过 ajax 提交
+  $("#form").on("success.form.bv" , function( e ){
+    // 阻止默认的提交
+    e.preventDefault();
 
+    $.ajax({
+      type: "post",
+      url: "/category/addSecondCategory",
+      data: $("#form").serialize(),
+      success: function( info ){
+        console.log(info);
+        if( info.success ){
+          // 添加成功， 需要关闭模态框
+          $("#addModal").modal("hide");
+          // 重新渲染页面， 渲染第一页
+          currentPage = 1 ;
+          render();
 
+          // 需要重置内容 和 校验状态
+          $('#form').data("bootstrapValidator").resetForm(true);
+
+          // 由于按钮 和 图片不是表单元素， 需要手动重置
+          $('#dropdownText').text("请选择一级分类");
+
+          // 图片重置
+          $('#imgBox img').attr("src" , "./images/none.png");
+
+        }
+      }
+    })
+  })
 
 })
